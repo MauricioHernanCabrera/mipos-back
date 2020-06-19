@@ -18,7 +18,7 @@ const newOpen = (balance) => {
     value_previous_close,
     observation: "",
   };
-  console.log({ data });
+
   return data;
 };
 
@@ -43,22 +43,16 @@ module.exports.balance = async (req, res, next) => {
     const [lastBalance = {}] = context.balance;
     let data = {};
 
-    const hasValueOpen =
-      lastBalance.value_open && typeof lastBalance.value_open == "number";
-    const hasValueClose =
-      lastBalance.value_close && typeof lastBalance.value_open == "number";
+    const hasValueOpen = typeof lastBalance.value_open == "number";
+    const hasValueClose = typeof lastBalance.value_close == "number";
 
     if (hasValueOpen && hasValueClose) {
-      console.log("hasValueOpen && hasValueClose");
       data = newOpen(lastBalance);
     } else if (hasValueOpen && !hasValueClose) {
-      console.log("hasValueOpen && !hasValueClose");
       data = getOpen(lastBalance);
     } else if (!hasValueOpen && hasValueClose) {
-      console.log("!hasValueOpen && hasValueClose");
       data = newOpen(lastBalance);
     } else {
-      console.log("!hasValueOpen && !hasValueClose");
       data = newOpen(lastBalance);
     }
 
@@ -67,8 +61,6 @@ module.exports.balance = async (req, res, next) => {
       results: data,
     };
 
-    console.log("------------------------------");
-    console.log(context.balance);
     res.status(200).json(responseSuccess);
   } catch (err) {
     next(err);
@@ -103,8 +95,6 @@ module.exports.balanceOpenDay = async (req, res, next) => {
 
     context.balance.unshift(openData);
 
-    console.log("------------------------------");
-    console.log(context.balance);
     res.status(201).json(responseSuccess);
   } catch (err) {
     next(err);
@@ -132,8 +122,6 @@ module.exports.hasOpenCashierBalance = async (req, res, next) => {
       card: "0",
     };
 
-    console.log("------------------------------");
-    console.log(context.balance);
     res.status(200).json(responseSuccess);
   } catch (err) {
     next(err);
@@ -160,8 +148,6 @@ module.exports.cashierBalanceCloseDay = async (req, res, next) => {
 
     const data = Object.assign({}, req.body);
 
-    console.log("cashierBalanceCloseDay", req.body);
-
     const indexItem = 0;
     const lengthItemToReplace = 1;
     const balanceItem = {
@@ -170,10 +156,20 @@ module.exports.cashierBalanceCloseDay = async (req, res, next) => {
     };
     context.balance.splice(indexItem, lengthItemToReplace, balanceItem);
 
-    console.log("------------------------------");
-    console.log(context.balance);
     res.status(200).json({
       msg: "Información guardada con éxito",
+      results: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.cleanContext = async (req, res, next) => {
+  try {
+    context.balance = [];
+    res.status(200).json({
+      msg: "Se limpio el contexto",
       results: null,
     });
   } catch (err) {
