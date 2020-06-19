@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const config = require("./config");
+const bodyParser = require("body-parser");
 
 const {
   notFound,
@@ -13,6 +14,7 @@ const routes = require("./routes");
 
 require("./utils/createContext");
 // middleware
+app.use(bodyParser.json());
 
 // cors
 app.use((req, res, next) => {
